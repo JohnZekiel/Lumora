@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import {
+  buildCompletedSession,
   selectRemainingSeconds,
   timerReducer,
   type TimerDurations,
@@ -46,6 +47,48 @@ describe('timerReducer', () => {
       endTime: 1_510_000,
       remainingSeconds: durations.focus,
       taskId: 'task-1',
+    });
+  });
+
+  describe('buildCompletedSession', () => {
+    const generateId = () => 'session-1';
+
+    it('returns null for a break mode', () => {
+      expect(
+        buildCompletedSession(
+          createBreakState('shortBreak', { endTime: 100_000 }),
+          generateId,
+        ),
+      ).toBeNull();
+    });
+
+    it('returns null when endTime is undefined', () => {
+      expect(buildCompletedSession(createState(), generateId)).toBeNull();
+    });
+
+    it('builds a session from a completed focus timer', () => {
+      const state = createState({
+        endTime: 1_510_000,
+        taskId: 'task-1',
+      });
+
+      expect(buildCompletedSession(state, generateId)).toEqual({
+        id: 'session-1',
+        mode: 'focus',
+        startedAt: 10_000,
+        endedAt: 1_510_000,
+        durationSeconds: durations.focus,
+        taskId: 'task-1',
+      });
+    });
+
+    it('omits taskTitle for caller resolution', () => {
+      const session = buildCompletedSession(
+        createState({ endTime: 1_510_000 }),
+        generateId,
+      );
+
+      expect(session).not.toHaveProperty('taskTitle');
     });
   });
 

@@ -82,6 +82,19 @@ describe('useSettings', () => {
     act(() => renderer.unmount());
   });
 
+  it('keeps the default when an invalid value is provided', async () => {
+    const { result, renderer } = await renderHook(() => useSettings());
+
+    await act(async () => {
+      await result.current.updateSettings({ focusDurationSeconds: 99999 });
+    });
+
+    expect(result.current.settings.focusDurationSeconds).toBe(
+      DEFAULT_SETTINGS.focusDurationSeconds,
+    );
+    act(() => renderer.unmount());
+  });
+
   it('keeps optimistic settings and exposes an error when saving fails', async () => {
     jest.mocked(saveSettings).mockRejectedValue(new Error('write failed'));
     const { result, renderer } = await renderHook(() => useSettings());

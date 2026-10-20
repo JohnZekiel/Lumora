@@ -1,3 +1,5 @@
+import type { FocusSession } from '../../shared/types/session';
+
 export type TimerMode = 'focus' | 'shortBreak' | 'longBreak';
 
 export type TimerDurations = {
@@ -191,4 +193,23 @@ export function selectRemainingSeconds(state: TimerState, now: number): number {
   }
 
   return Math.max(0, Math.ceil(((state.endTime ?? now) - now) / 1000));
+}
+
+export function buildCompletedSession(
+  state: TimerState,
+  generateId: () => string,
+): FocusSession | null {
+  if (state.mode !== 'focus' || state.endTime === undefined) {
+    return null;
+  }
+
+  return {
+    id: generateId(),
+    mode: 'focus',
+    // This is the scheduled start; pauses and resumes do not change it.
+    startedAt: state.endTime - state.durations.focus * 1000,
+    endedAt: state.endTime,
+    durationSeconds: state.durations.focus,
+    taskId: state.taskId,
+  };
 }
