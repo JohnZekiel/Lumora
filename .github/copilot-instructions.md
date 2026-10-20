@@ -25,3 +25,6 @@ Calm productivity app: tasks, focus timer, break wellness, analytics, optional v
 - Timer accuracy from absolute `endTime`, never from tick counts
 - Do not claim a feature works; surface failures explicitly (AI fallback, notification denial)
 - English only
+
+## Tests
+Every test file imports `describe`, `it`, `expect`, `jest` from `@jest/globals`. Do not rely on global jest types — `@types/jest` is not installed.

@@ -11,9 +11,11 @@ export interface TaskStep {
 export interface TaskItem {
   id: string;
   title: string;
+  category?: string;
   priority: Priority;
-  status: TaskStatus;
   estimate?: number;
   deadline?: string;
   steps: TaskStep[];
+  createdAt: number;
+  completedAt?: number;
 }
