@@ -15,7 +15,7 @@ export type NewTaskInput = {
   steps?: { title: string }[];
 };
 
-type TaskUpdates = Partial<Omit<TaskItem, 'id' | 'createdAt' | 'completedAt'>>;
+export type TaskUpdates = Partial<Omit<TaskItem, 'id' | 'createdAt' | 'completedAt'>>;
 
 export function createTask(input: NewTaskInput, deps: CreateTaskDeps): TaskItem {
   return {
