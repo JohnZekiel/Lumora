@@ -1,7 +1,7 @@
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { createElement } from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { ActivityIndicator, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { HomeScreen } from '../HomeScreen';
 import { useSettings } from '../../../features/settings/useSettings';
 import { useTimer } from '../../../features/focus/useTimer';
@@ -58,11 +58,24 @@ jest.mock('../../components/CircularTimer', () => ({
 }));
 
 jest.mock('../../components/TaskCard', () => ({
-  TaskCard: ({ task }: { task: { title: string } }) => {
+  TaskCard: ({
+    task,
+    onSelect,
+  }: {
+    task: { id: string; title: string };
+    onSelect: (id: string) => void;
+  }) => {
     const React = jest.requireActual<typeof import('react')>('react');
     const ReactNative =
       jest.requireActual<typeof import('react-native')>('react-native');
-    return React.createElement(ReactNative.Text, null, task.title);
+    return React.createElement(
+      ReactNative.Pressable,
+      {
+        accessibilityLabel: `select-${task.id}`,
+        onPress: () => onSelect(task.id),
+      },
+      React.createElement(ReactNative.Text, null, task.title),
+    );
   },
 }));
 
@@ -105,8 +118,8 @@ const settingsResult = (loading: boolean): UseSettingsResult => ({
   reload: jest.fn<UseSettingsResult['reload']>().mockResolvedValue(),
 });
 
-const tasksResult = (): UseTasksResult => ({
-  tasks: [],
+const tasksResult = (tasks: UseTasksResult['tasks'] = []): UseTasksResult => ({
+  tasks,
   loading: false,
   error: undefined,
   createTask: jest.fn<UseTasksResult['createTask']>().mockResolvedValue(),
@@ -178,6 +191,91 @@ describe('HomeScreen', () => {
     });
 
     expect(timer.start).toHaveBeenCalledTimes(1);
+    act(() => renderer.unmount());
+  });
+
+  it('calls timer.start with the selected task id', async () => {
+    jest.mocked(useSettings).mockReturnValue(settingsResult(false));
+    const timer = timerResult();
+    jest.mocked(useTimer).mockReturnValue(timer);
+    jest.mocked(useTasks).mockReturnValue(
+      tasksResult([
+        {
+          id: 'task-selected',
+          title: 'Selected task',
+          priority: 'medium',
+          steps: [],
+          createdAt: 10,
+        },
+      ]),
+    );
+
+    const renderer = renderScreen();
+    const taskButton = renderer.root.findByProps({
+      accessibilityLabel: 'select-task-selected',
+    });
+    act(() => taskButton.props.onPress());
+
+    expect(
+      renderer.root
+        .findAllByType(Text)
+        .some(
+          (node) =>
+            (Array.isArray(node.props.children)
+              ? node.props.children.join('')
+              : node.props.children) === 'Focusing on: Selected task',
+        ),
+    ).toBe(true);
+
+    const startButton = renderer.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .find((button) => button.findByType(Text).props.children === 'Start');
+    await act(async () => startButton!.props.onPress());
+
+    expect(timer.start).toHaveBeenCalledWith('task-selected');
+    act(() => renderer.unmount());
+  });
+
+  it('does not change selected task while the timer is running', () => {
+    jest.mocked(useSettings).mockReturnValue(settingsResult(false));
+    jest.mocked(useTimer).mockReturnValue(
+      timerResult({
+        state: {
+          ...timerResult().state,
+          isRunning: true,
+          endTime: 2000,
+        },
+      }),
+    );
+    jest.mocked(useTasks).mockReturnValue(
+      tasksResult([
+        {
+          id: 'task-selected',
+          title: 'Selected task',
+          priority: 'medium',
+          steps: [],
+          createdAt: 10,
+        },
+      ]),
+    );
+
+    const renderer = renderScreen();
+    act(() => {
+      renderer.root
+        .findByProps({ accessibilityLabel: 'select-task-selected' })
+        .props.onPress();
+    });
+
+    expect(
+      renderer.root
+        .findAllByType(Text)
+        .some(
+          (node) =>
+            (Array.isArray(node.props.children)
+              ? node.props.children.join('')
+              : node.props.children) === 'Focusing on: Selected task',
+        ),
+    ).toBe(false);
     act(() => renderer.unmount());
   });
 });

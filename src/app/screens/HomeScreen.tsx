@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
@@ -25,6 +25,7 @@ function formatSeconds(seconds: number): string {
 }
 
 export function HomeScreen() {
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const { settings, loading: settingsLoading } = useSettings();
   const tasksHook = useTasks();
   useFocusEffect(
@@ -49,6 +50,9 @@ export function HomeScreen() {
   const duration = timer.state.durations[timer.state.mode];
   const remainingSeconds = timer.remainingSeconds;
   const isAtFullDuration = remainingSeconds >= duration;
+  const selectedTask = tasksHook.tasks.find((task) => task.id === selectedTaskId);
+  const selectionDisabled =
+    timer.state.isRunning || remainingSeconds < duration;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,6 +61,11 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
+          {selectedTask ? (
+            <Text style={styles.focusLabel}>
+              Focusing on: {selectedTask.title}
+            </Text>
+          ) : null}
           <CircularTimer
             progress={duration > 0 ? remainingSeconds / duration : 0}
             timeText={formatSeconds(remainingSeconds)}
@@ -74,7 +83,7 @@ export function HomeScreen() {
             ) : remainingSeconds > 0 ? (
               <ActionButton
                 label={isAtFullDuration ? 'Start' : 'Resume'}
-                onPress={() => void timer.start()}
+                onPress={() => void timer.start(selectedTaskId)}
                 primary
               />
             ) : null}
@@ -95,8 +104,14 @@ export function HomeScreen() {
               <TaskCard
                 key={task.id}
                 task={task}
+                isSelected={task.id === selectedTaskId}
                 onToggleComplete={(id) => {
                   void tasksHook.toggleTaskCompletion(id);
+                }}
+                onSelect={(id) => {
+                  if (!selectionDisabled) {
+                    setSelectedTaskId(id);
+                  }
                 }}
               />
             ))
@@ -157,6 +172,11 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     gap: 24,
+  },
+  focusLabel: {
+    color: '#6C5AA8',
+    fontSize: 16,
+    fontWeight: '600',
   },
   taskSection: {
     width: '100%',
