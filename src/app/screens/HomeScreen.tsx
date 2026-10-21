@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -9,9 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSettings } from '../../features/settings/useSettings';
 import { useTimer } from '../../features/focus/useTimer';
+import { useTasks } from '../../features/tasks/useTasks';
 import { loadSessions, saveSessions } from '../../infrastructure/storage/sessionRepository';
 import type { FocusSession } from '../../shared/types/session';
 import { CircularTimer } from '../components/CircularTimer';
+import { TaskCard } from '../components/TaskCard';
 
 function formatSeconds(seconds: number): string {
   const safeSeconds = Math.max(0, Math.floor(seconds));
@@ -22,6 +26,12 @@ function formatSeconds(seconds: number): string {
 
 export function HomeScreen() {
   const { settings, loading: settingsLoading } = useSettings();
+  const tasksHook = useTasks();
+  useFocusEffect(
+    useCallback(() => {
+      void tasksHook.reload();
+    }, [tasksHook.reload]),
+  );
   const handleSessionComplete = useCallback(async (session: FocusSession) => {
     const existing = await loadSessions();
     await saveSessions([...existing, session]);
@@ -42,32 +52,62 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <CircularTimer
-          progress={duration > 0 ? remainingSeconds / duration : 0}
-          timeText={formatSeconds(remainingSeconds)}
-          modeText={timer.state.mode === 'focus' ? 'Focus' : 'Break'}
-          isRunning={timer.state.isRunning}
-        />
-        {timer.error ? (
-          <Text accessibilityRole="alert" style={styles.error}>
-            {timer.error}
-          </Text>
-        ) : null}
-        <View style={styles.controls}>
-          {timer.state.isRunning ? (
-            <ActionButton label="Pause" onPress={() => void timer.pause()} />
-          ) : remainingSeconds > 0 ? (
-            <ActionButton
-              label={isAtFullDuration ? 'Start' : 'Resume'}
-              onPress={() => void timer.start()}
-              primary
-            />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <CircularTimer
+            progress={duration > 0 ? remainingSeconds / duration : 0}
+            timeText={formatSeconds(remainingSeconds)}
+            modeText={timer.state.mode === 'focus' ? 'Focus' : 'Break'}
+            isRunning={timer.state.isRunning}
+          />
+          {timer.error ? (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {timer.error}
+            </Text>
           ) : null}
-          <ActionButton label="Reset" onPress={() => void timer.reset()} />
-          <ActionButton label="Stop" onPress={() => void timer.stop()} />
+          <View style={styles.controls}>
+            {timer.state.isRunning ? (
+              <ActionButton label="Pause" onPress={() => void timer.pause()} />
+            ) : remainingSeconds > 0 ? (
+              <ActionButton
+                label={isAtFullDuration ? 'Start' : 'Resume'}
+                onPress={() => void timer.start()}
+                primary
+              />
+            ) : null}
+            <ActionButton label="Reset" onPress={() => void timer.reset()} />
+            <ActionButton label="Stop" onPress={() => void timer.stop()} />
+          </View>
         </View>
-      </View>
+        <View style={styles.taskSection}>
+          <Text style={styles.sectionTitle}>Tasks</Text>
+          {tasksHook.loading ? (
+            <ActivityIndicator color="#8B7BC7" />
+          ) : tasksHook.tasks.length === 0 ? (
+            <Text style={styles.emptyText}>
+              No tasks yet. Tap Add to create one.
+            </Text>
+          ) : (
+            tasksHook.tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onToggleComplete={(id) => {
+                  void tasksHook.toggleTaskCompletion(id);
+                }}
+              />
+            ))
+          )}
+          {tasksHook.error ? (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {tasksHook.error}
+            </Text>
+          ) : null}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -109,9 +149,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#F8F6FC',
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
   content: {
     alignItems: 'center',
-    gap: 32,
+    gap: 24,
+  },
+  taskSection: {
+    width: '100%',
+    marginTop: 36,
+  },
+  sectionTitle: {
+    marginBottom: 14,
+    color: '#2D2D2D',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  emptyText: {
+    color: '#777',
+    fontSize: 14,
   },
   controls: {
     flexDirection: 'row',

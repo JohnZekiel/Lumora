@@ -5,10 +5,12 @@ import { ActivityIndicator, Text } from 'react-native';
 import { HomeScreen } from '../HomeScreen';
 import { useSettings } from '../../../features/settings/useSettings';
 import { useTimer } from '../../../features/focus/useTimer';
+import { useTasks } from '../../../features/tasks/useTasks';
 import { loadSessions, saveSessions } from '../../../infrastructure/storage/sessionRepository';
 import { DEFAULT_SETTINGS } from '../../../shared/settings/settingsDefaults';
 import type { UseTimerResult } from '../../../features/focus/useTimer';
 import type { UseSettingsResult } from '../../../features/settings/useSettings';
+import type { UseTasksResult } from '../../../features/tasks/useTasks';
 
 jest.mock('../../../features/settings/useSettings', () => ({
   useSettings: jest.fn(),
@@ -16,6 +18,19 @@ jest.mock('../../../features/settings/useSettings', () => ({
 
 jest.mock('../../../features/focus/useTimer', () => ({
   useTimer: jest.fn(),
+}));
+
+jest.mock('../../../features/tasks/useTasks', () => ({
+  useTasks: jest.fn(),
+}));
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual<typeof import('@react-navigation/native')>(
+    '@react-navigation/native',
+  ),
+  useFocusEffect: (callback: () => void) => {
+    callback();
+  },
 }));
 
 jest.mock('../../../infrastructure/storage/sessionRepository', () => ({
@@ -39,6 +54,15 @@ jest.mock('../../components/CircularTimer', () => ({
       null,
       `${modeText} ${timeText}`,
     );
+  },
+}));
+
+jest.mock('../../components/TaskCard', () => ({
+  TaskCard: ({ task }: { task: { title: string } }) => {
+    const React = jest.requireActual<typeof import('react')>('react');
+    const ReactNative =
+      jest.requireActual<typeof import('react-native')>('react-native');
+    return React.createElement(ReactNative.Text, null, task.title);
   },
 }));
 
@@ -81,14 +105,36 @@ const settingsResult = (loading: boolean): UseSettingsResult => ({
   reload: jest.fn<UseSettingsResult['reload']>().mockResolvedValue(),
 });
 
+const tasksResult = (): UseTasksResult => ({
+  tasks: [],
+  loading: false,
+  error: undefined,
+  createTask: jest.fn<UseTasksResult['createTask']>().mockResolvedValue(),
+  updateTask: jest.fn<UseTasksResult['updateTask']>().mockResolvedValue(),
+  toggleTaskCompletion: jest
+    .fn<UseTasksResult['toggleTaskCompletion']>()
+    .mockResolvedValue(),
+  toggleStepCompletion: jest
+    .fn<UseTasksResult['toggleStepCompletion']>()
+    .mockResolvedValue(),
+  addTaskStep: jest.fn<UseTasksResult['addTaskStep']>().mockResolvedValue(),
+  removeTaskStep: jest
+    .fn<UseTasksResult['removeTaskStep']>()
+    .mockResolvedValue(),
+  deleteTask: jest.fn<UseTasksResult['deleteTask']>().mockResolvedValue(),
+  reload: jest.fn<UseTasksResult['reload']>().mockResolvedValue(),
+});
+
 describe('HomeScreen', () => {
   beforeEach(() => {
     jest.mocked(useSettings).mockReset();
     jest.mocked(useTimer).mockReset();
+    jest.mocked(useTasks).mockReset();
     jest.mocked(loadSessions).mockReset();
     jest.mocked(saveSessions).mockReset();
     jest.mocked(useSettings).mockReturnValue(settingsResult(true));
     jest.mocked(useTimer).mockReturnValue(timerResult({ loading: true }));
+    jest.mocked(useTasks).mockReturnValue(tasksResult());
     jest.mocked(loadSessions).mockResolvedValue([]);
     jest.mocked(saveSessions).mockResolvedValue();
   });
