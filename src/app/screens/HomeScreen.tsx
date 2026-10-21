@@ -83,12 +83,17 @@ export function HomeScreen() {
             ) : remainingSeconds > 0 ? (
               <ActionButton
                 label={isAtFullDuration ? 'Start' : 'Resume'}
-                onPress={() => void timer.start(selectedTaskId)}
+                onPress={() => {
+                  if (isAtFullDuration) {
+                    void timer.start(selectedTaskId);
+                  } else {
+                    void timer.resume();
+                  }
+                }}
                 primary
               />
             ) : null}
             <ActionButton label="Reset" onPress={() => void timer.reset()} />
-            <ActionButton label="Stop" onPress={() => void timer.stop()} />
           </View>
         </View>
         <View style={styles.taskSection}>

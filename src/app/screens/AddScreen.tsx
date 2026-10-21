@@ -94,6 +94,17 @@ export function AddScreen() {
     }
   };
 
+  const handleDeadlineChange = (text: string): void => {
+    const cleaned = text.replace(/\D/g, '');
+    let formatted = cleaned;
+    if (cleaned.length > 4 && cleaned.length <= 6) {
+      formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+    } else if (cleaned.length > 6) {
+      formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
+    }
+    setDeadline(formatted);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -165,7 +176,8 @@ export function AddScreen() {
           accessibilityLabel="Deadline"
           placeholder="Deadline (YYYY-MM-DD)"
           value={deadline}
-          onChangeText={setDeadline}
+          onChangeText={handleDeadlineChange}
+          keyboardType="numeric"
           style={styles.input}
         />
         {errors.deadline ? (

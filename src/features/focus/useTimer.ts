@@ -179,6 +179,27 @@ export function useTimer(options: UseTimerOptions): UseTimerResult {
     return () => clearInterval(interval);
   }, [dispatch, state.endTime, state.isRunning]);
 
+  useEffect(() => {
+    const newDurations = durationsFromSettings();
+    const prev = stateRef.current;
+    const nextState: TimerState =
+      !prev.isRunning &&
+      prev.endTime === undefined &&
+      prev.remainingSeconds === prev.durations[prev.mode]
+        ? {
+            ...prev,
+            durations: newDurations,
+            remainingSeconds: newDurations[prev.mode],
+          }
+        : {
+            ...prev,
+            durations: newDurations,
+          };
+
+    stateRef.current = nextState;
+    setState(nextState);
+  }, [options.settings, durationsFromSettings]);
+
   const start = useCallback(
     async (taskId?: string): Promise<void> => {
       if (stateRef.current.isRunning) {
