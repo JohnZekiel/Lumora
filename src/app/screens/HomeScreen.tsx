@@ -42,7 +42,7 @@ export function HomeScreen() {
   if (settingsLoading || timer.loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator color="#8B7BC7" />
+        <ActivityIndicator color="#4A7859" />
       </SafeAreaView>
     );
   }
@@ -94,7 +94,7 @@ export function HomeScreen() {
         <View style={styles.taskSection}>
           <Text style={styles.sectionTitle}>Tasks</Text>
           {tasksHook.loading ? (
-            <ActivityIndicator color="#8B7BC7" />
+            <ActivityIndicator color="#4A7859" />
           ) : tasksHook.tasks.length === 0 ? (
             <Text style={styles.emptyText}>
               No tasks yet. Tap Add to create one.
@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F8F6FC',
+    backgroundColor: '#F4F8F5',
   },
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F8F6FC',
+    backgroundColor: '#F4F8F5',
   },
   scrollContent: {
     flexGrow: 1,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   focusLabel: {
-    color: '#6C5AA8',
+    color: '#365A42',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   primaryButton: {
-    backgroundColor: '#8B7BC7',
+    backgroundColor: '#4A7859',
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    borderColor: '#8B7BC7',
+    borderColor: '#4A7859',
     borderWidth: 1,
   },
   pressed: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   secondaryLabel: {
-    color: '#8B7BC7',
+    color: '#4A7859',
     fontWeight: '600',
   },
   error: {

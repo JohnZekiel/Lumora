@@ -32,7 +32,7 @@ export function CircularTimer({
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke="#E8E2F2"
+          stroke="#D5E3D9"
           strokeWidth={STROKE_WIDTH}
         />
         <Circle
@@ -40,7 +40,7 @@ export function CircularTimer({
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke="#8B7BC7"
+          stroke="#4A7859"
           strokeWidth={STROKE_WIDTH}
           strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
           strokeDashoffset={CIRCUMFERENCE * (1 - boundedProgress)}
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     height: SIZE,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F8F6FC',
+    backgroundColor: '#F4F8F5',
     borderRadius: SIZE / 2,
   },
   ring: {

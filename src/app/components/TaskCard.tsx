@@ -35,7 +35,7 @@ export function TaskCard({
           <Ionicons
             name={completed ? 'checkmark-circle' : 'ellipse-outline'}
             size={24}
-            color={completed ? '#8B7BC7' : '#ccc'}
+            color={completed ? '#4A7859' : '#ccc'}
           />
         </Pressable>
         <Pressable
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedCard: {
-    borderColor: '#8B7BC7',
+    borderColor: '#4A7859',
     borderWidth: 2,
   },
   pressed: {

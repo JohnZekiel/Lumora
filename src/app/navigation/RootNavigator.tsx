@@ -24,7 +24,7 @@
         <Tab.Navigator
           screenOptions={({ route }) => ({
             headerShown: false,
-            tabBarActiveTintColor: '#8B7BC7',
+            tabBarActiveTintColor: '#4A7859',
             tabBarInactiveTintColor: '#999',
             tabBarStyle: { paddingBottom: insets.bottom },
             tabBarIcon: ({ color, size }) => {

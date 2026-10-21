@@ -162,7 +162,7 @@ function DurationRow({ label, value, onChangeText }: DurationRowProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F6FC',
+    backgroundColor: '#F4F8F5',
   },
   content: {
     flexGrow: 1,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 8,
-    backgroundColor: '#F5F3F8',
+    backgroundColor: '#EDF3EF',
     color: '#2D2D2D',
     textAlign: 'center',
   },
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginTop: 28,
     paddingVertical: 15,
     borderRadius: 24,
-    backgroundColor: '#8B7BC7',
+    backgroundColor: '#4A7859',
   },
   saveLabel: {
     color: '#fff',

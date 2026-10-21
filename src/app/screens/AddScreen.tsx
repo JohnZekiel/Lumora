@@ -197,7 +197,7 @@ export function AddScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F6FC',
+    backgroundColor: '#F4F8F5',
   },
   form: {
     flexGrow: 1,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E0EC',
+    borderColor: '#D8E4DC',
     backgroundColor: '#fff',
     color: '#2D2D2D',
     fontSize: 16,
@@ -244,14 +244,14 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#8B7BC7',
+    borderColor: '#4A7859',
     backgroundColor: '#fff',
   },
   activePriority: {
-    backgroundColor: '#8B7BC7',
+    backgroundColor: '#4A7859',
   },
   priorityText: {
-    color: '#8B7BC7',
+    color: '#4A7859',
     fontWeight: '600',
   },
   activePriorityText: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 15,
     borderRadius: 24,
-    backgroundColor: '#8B7BC7',
+    backgroundColor: '#4A7859',
   },
   submitLabel: {
     color: '#fff',
